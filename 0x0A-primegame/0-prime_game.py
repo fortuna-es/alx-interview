@@ -1,55 +1,78 @@
 #!/usr/bin/python3
 """
-Contains method to determine the winner of a game
-of prime numbers.
+Prime Game
 """
 
 
-def prime_numbers_between(n):
+def findMultiples(num, targets):
     """
-    calculate prime numbers between 1 and n
-
-    Args:
-        n (int): the number to calculate prime numbers up to
-
-    Returns:
-        int: the number of prime numbers between 1 and n
+    Finds multiples of a given number within a list
     """
-    prime_numbers = 0
+    for i in targets:
+        if i % num == 0:
+            targets.remove(i)
+    return targets
 
-    for i in range(2, n + 1):
-        is_prime = True
-        for j in range(2, i // 2 + 1):
-            if i % j == 0:
-                is_prime = False
-                break
-        if is_prime:
-            prime_numbers += 1
-    return prime_numbers
+
+def isPrime(i):
+    """
+    Check if a number is prime.
+    """
+    if i == 1:
+        return False
+    for j in range(2, i):
+        if i % j == 0:
+            return False
+    return True
+
+
+def findPrimes(n):
+    """
+    Dispatch a given set into prime numbers and non-prime numbers.
+    """
+    counter = 0
+    target = list(n)
+    for i in range(1, len(target) + 1):
+        if isPrime(i):
+            counter += 1
+            target.remove(i)
+            target = findMultiples(i, target)
+        else:
+            pass
+    return counter
 
 
 def isWinner(x, nums):
     """
-    Determines the winner of a game of prime numbers.
+    Maria and Ben are playing a game.Given a set of consecutive integers
+    starting from 1 up to and including n, they take turns choosing a
+    prime number from the set and removing that number and its
+    multiples from the set.
+    The player that cannot make a move loses the game.
 
-    Args:
-        x (int): the number of rounds to play
-        nums (list): the list of numbers n to play
-
-    Returns:
-        string: the winner of the game (Ben or Maria)
+    They play x rounds of the game, where n may be different for each round.
+    Assuming Maria always goes first and both players play optimally,
+    determine who the winner of each game is.
     """
-    if not x or not nums:
+    players = {'Maria': 0, 'Ben': 0}
+    cluster = set()
+    for elem in range(x):
+        nums.sort()
+        num = nums[elem]
+        for i in range(1, num + 1):
+            cluster.add(i)
+            if i == num + 1:
+                break
+        temp = findPrimes(cluster)
+
+        if temp % 2 == 0:
+            players['Ben'] += 1
+        elif temp % 2 != 0:
+            players['Maria'] += 1
+
+    if players['Maria'] > players['Ben']:
+        return 'Maria'
+    elif players['Maria'] < players['Ben']:
+        return 'Ben'
+    else:
         return None
-    ben = 0
-    maria = 0
-    for i in range(x):
-        prime_nums = prime_numbers_between(nums[i])
-        if prime_nums % 2 == 0:
-            ben += 1
-        else:
-            maria += 1
-    if ben == maria:
-        return None
-    winner = "Ben" if ben > maria else "Maria"
-    return winner
